@@ -9,7 +9,7 @@ SICP, the functional programming style would works for good.
 ** Chapter 2
 *** Naming constants
 We can name value by declaring with ML keywords ~val~
-#+BEGIN_SRC sml :session *sml* :results
+#+BEGIN_SRC sml :session *sml* :results org
 val seconds = 60;
 seconds
 #+END_SRC
@@ -21,3 +21,16 @@ val it = 60 : int
 
 Note that we have to begin with ~val~ and end with semicolon ~;~.
 All the ML statement should end with ~;~ like above--similar to java.
+
+For now, we can treat ML as calculator:
+#+BEGIN_SRC sml :results org
+val pi = 3.14159;
+val r = 2.0;
+val area = pi * r * r;
+area
+#+END_SRC
+
+#+RESULTS:
+#+begin_src org
+val r = 2.0 : real
+#+end_src
