@@ -9,7 +9,7 @@ SICP, the functional programming style would works for good.
 ** Chapter 2
 *** Naming constants
 We can name value by declaring with ML keywords ~val~
-#+BEGIN_SRC sml :session *sml* :results org
+#+BEGIN_SRC sml :session *sml* :results
 val seconds = 60;
 seconds
 #+END_SRC
