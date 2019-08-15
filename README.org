@@ -9,28 +9,82 @@ SICP, the functional programming style would works for good.
 ** Chapter 2
 *** Naming constants
 We can name value by declaring with ML keywords ~val~
-#+BEGIN_SRC sml :session *sml* :results org
+#+BEGIN_SRC sml
 val seconds = 60;
-seconds
 #+END_SRC
 
 #+RESULTS:
-#+begin_src org
-val it = 60 : int
-#+end_src
+: val seconds = 60 : int
+: END
 
 Note that we have to begin with ~val~ and end with semicolon ~;~.
 All the ML statement should end with ~;~ like above--similar to java.
 
 For now, we can treat ML as calculator:
-#+BEGIN_SRC sml :results org
+#+BEGIN_SRC sml
 val pi = 3.14159;
 val r = 2.0;
 val area = pi * r * r;
-area
 #+END_SRC
 
 #+RESULTS:
-#+begin_src org
-val r = 2.0 : real
-#+end_src
+: val pi = 3.14159 : real
+: val r = 2.0 : real
+: val area = 12.56636 : real
+: END
+
+*** Declaring functions
+we can capture the [[Naming constants][previous]] calculation as function:
+#+BEGIN_SRC sml
+fun area(r) = pi*r*r;
+#+END_SRC
+
+#+RESULTS:
+: val area = fn : real -> real
+: END
+
+Then we can call it with argument:
+#+BEGIN_SRC sml
+area(2.0);
+#+END_SRC
+
+#+RESULTS:
+: val it = 12.56636 : real
+: END
+
+The parentheses around the argument are optional:
+#+BEGIN_SRC sml
+area 1.0;
+#+END_SRC
+
+#+RESULTS:
+: val it = 3.14159 : real
+: END
+
+It is also true when we declare the function:
+#+BEGIN_SRC sml
+fun area r = pi*r*r;
+#+END_SRC
+
+#+RESULTS:
+: val area = fn : real -> real
+: END
+
+**** Comments
+The comment's syntax in Standard ML begins with ~(*~ and ends with ~*)~, which
+is same as Isabelle--Isabelle inherite this from SML more correctly.
+
+It is important to put some comments for clarity of one's purpose (for that
+purpose I've started literal programming in org mode like this.):
+#+BEGIN_SRC sml
+fun area r = (* area of circle with radius r *)
+    pi*r*r;
+#+END_SRC
+
+Yeah, it looks silly to comment like this simple function; but when we make
+a lot of abstract layers, it comes as big help.
+
+**** Identifiers
+It is allowed to use /symbolic names/ as identifies:
+| symbolic names | ~! % & $ # + - * / : < = > ? @ \ ~ ` ^ * \vert~ |
+| example        | ~val +-+-+- = 1415;~                            |
