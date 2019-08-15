@@ -8,7 +8,7 @@ SICP, the functional programming style would works for good.
 * Study Note
 ** Chapter 2
 *** Naming constants
-We can name value by declaring with ML keywords `val`
+We can name value by declaring with ML keywords ~val~
 #+BEGIN_SRC sml
 val seconds = 60;
 #+END_SRC
@@ -16,5 +16,5 @@ val seconds = 60;
 #+RESULTS:
 : val it = "stdIn" : string
 
-Note that we have to begin with `val` and end with semicolon `;`.
-All the ML statement should end with `;` like above--similar to java.
+Note that we have to begin with ~val~ and end with semicolon ~;~.
+All the ML statement should end with ~;~ like above--similar to java.
