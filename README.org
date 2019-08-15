@@ -1,0 +1,20 @@
+#+TITLE: ML for the Working Programmer
+
+* Why SML?
+For me, it is due to learning Isabelle more effectively; and also as I'm doing
+SICP, the functional programming style would works for good.
+* Resources
+-[[https://www.cl.cam.ac.uk/~lp15/MLbook/pub-details.html][Text book (freely distributed in online)]]
+* Study Note
+** Chapter 2
+*** Naming constants
+We can name value by declaring with ML keywords `val`
+#+BEGIN_SRC sml
+val seconds = 60;
+#+END_SRC
+
+#+RESULTS:
+: val it = "stdIn" : string
+
+Note that we have to begin with `val` and end with semicolon `;`.
+All the ML statement should end with `;` like above--similar to java.
