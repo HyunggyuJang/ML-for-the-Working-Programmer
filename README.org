@@ -84,7 +84,7 @@ fun area r = (* area of circle with radius r *)
 Yeah, it looks silly to comment like this simple function; but when we make
 a lot of abstract layers, it comes as big help.
 
-**** Identifiers
+*** Identifiers
 It is allowed to use /symbolic names/ as identifies:
 | symbolic names | ~! % & $ # + - * / : < = > ? @ \ ~ ` ^ * ¦~ |
 
@@ -96,3 +96,79 @@ val +-+ = 1415;
 #+RESULTS:
 : val +-+ = 1415 : int
 : END
+
+**** Exercise 2.1
+
+For starting an ML session, use the command ~run-sml~.
+#+BEGIN_SRC sml
+use "exercise2_1.sml";
+#+END_SRC
+To terminate the REPL session, type ~~,i.e. end of file.
+
+*** Arithmetic
+**** Integers
+To type the negative integer, prepend the tilde to the digit:
+#+BEGIN_SRC sml
+~23
+#+END_SRC
+
+Integer operations are infix with conventional precedences, whereas scheme
+(lisp) has prefix so that it doesn't need the concept of precedences.
+
+**** Real numbers
+A real constant contains ~E~ notation: ~E~ /n/ means times the /n/ th power of 10.
+/n/ can be negative integer:
+~123.4E\~2~ denotes 1.234.
+
+Note that function application binds more tightly than infix operators:
+~area a + b~ is equivalent to ~(area a) + b~ not ~area (a + b)~.
+
+**** Exercise 2.2
+As ML is strictly typed language when we consider the real and integer numbers
+as one unit, namely number, then we have some problems:
+- We can not have integer division because we think integer as real number.
+- We can not have remiander function; if it is, then it should work also to real
+  numbers, which is certainly not what we wanted.
+
+
+On the other hand, Lisp has dynamically typed language--weakly typed, it can
+have the integer division and remainder procedures, which is specific to integer
+numbers; basically Lisp also differentiate the real number and integer number
+under the hood. So, it is not fair to say "ML should simply provide numbers, as
+Lisp does \cdots"
+**** Exercise 2.3
+Let's do some experiment:
+#+BEGIN_SRC sml
+2 * 1.2
+#+END_SRC
+
+#+RESULTS:
+:
+
+which raises error says "Error: operator and operand do not agree [overload conflict]"
+
+We can conclude from this that the integer number does not coerced to real number
+automatically. So the ~fun double(n) = 2*n;~ doesn't need to specify the type
+constraints because the ~2~ cast that ~n~ should be int unless it raises error
+like above.
+
+Second experiment:
+#+BEGIN_SRC sml
+Math.sin(1)
+#+END_SRC
+
+#+RESULTS:
+: stdIn:1.2-5.4 Error: operator and operand do not agree [overload conflict]
+: operator domain: real
+: operand:         [int ty]
+: in expression:
+: Math.sin 1
+
+which raises "Error: operator and operand do not agree [overload conflict]".
+
+So we can deduce from this that ~Math.sin~ expect to take real as its argument's type.
+As consequence, ~fun f~ also need not to be constrained.
+
+On the other hands, the last one need to be constrained; ML can not deduce the
+type of argument as ~*~ is overloaded function,i.e. it can be used with integer
+as real as well.
