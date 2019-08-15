@@ -86,4 +86,13 @@ a lot of abstract layers, it comes as big help.
 
 **** Identifiers
 It is allowed to use /symbolic names/ as identifies:
-| symbolic names | ~! % & $ # + - * / : < = > ? @ \ ~ ` ^ *~ \vert |
+| symbolic names | ~! % & $ # + - * / : < = > ? @ \ ~ ` ^ * ¦~ |
+
+So it is valid expression in ML:
+#+BEGIN_SRC sml
+val +-+ = 1415;
+#+END_SRC
+
+#+RESULTS:
+: val +-+ = 1415 : int
+: END
