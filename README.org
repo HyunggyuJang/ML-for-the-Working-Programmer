@@ -86,5 +86,4 @@ a lot of abstract layers, it comes as big help.
 
 **** Identifiers
 It is allowed to use /symbolic names/ as identifies:
-| symbolic names | ~! % & $ # + - * / : < = > ? @ \ ~ ` ^ * \vert~ |
-| example        | ~val +-+-+- = 1415;~                            |
+| symbolic names | ~! % & $ # + - * / : < = > ? @ \ ~ ` ^ *~ \vert |
