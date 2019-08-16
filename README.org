@@ -218,8 +218,8 @@ digit 10;
 : raised at: stdIn:10.15-10.25
 
 Uh-oh, the function call ~digit ~1~ of first version did not raise the error it
-returns ~"/"~; it turns out accept negative integer as its code! Interesting.
-And as expected the ~digit 10~ returns ~":"~ not error.
+returns ~/~ ; it turns out accept negative integer as its code! Interesting.
+And as expected the ~digit 10~ returns ~:~ not error.
 
 How about the second one?; which raises error says "uncaught exception Subscript [subscript out of bounds]
 " in both case as expected. Not like python huh.
