@@ -86,7 +86,7 @@ a lot of abstract layers, it comes as big help.
 
 *** Identifiers
 It is allowed to use /symbolic names/ as identifies:
-| symbolic names | ~! % & $ # + - * / : < = > ? @ \ ~ ` ^ * ¦~ |
+| symbolic names | ~! % & $ # + - * / : < = > ? @ \ ~ ` ^ *~ \vert |
 
 So it is valid expression in ML:
 #+BEGIN_SRC sml
@@ -103,7 +103,7 @@ For starting an ML session, use the command ~run-sml~.
 #+BEGIN_SRC sml
 use "exercise2_1.sml";
 #+END_SRC
-To terminate the REPL session, type ~~,i.e. end of file.
+To terminate the REPL session, type ~<C-d>~,i.e. end of file.
 
 *** Arithmetic
 **** Integers
@@ -118,7 +118,7 @@ Integer operations are infix with conventional precedences, whereas scheme
 **** Real numbers
 A real constant contains ~E~ notation: ~E~ /n/ means times the /n/ th power of 10.
 /n/ can be negative integer:
-~123.4E\~2~ denotes 1.234.
+~123.4E~2~ denotes 1.234.
 
 Note that function application binds more tightly than infix operators:
 ~area a + b~ is equivalent to ~(area a) + b~ not ~area (a + b)~.
@@ -135,7 +135,7 @@ On the other hand, Lisp has dynamically typed language--weakly typed, it can
 have the integer division and remainder procedures, which is specific to integer
 numbers; basically Lisp also differentiate the real number and integer number
 under the hood. So, it is not fair to say "ML should simply provide numbers, as
-Lisp does \cdots"
+Lisp does \cdots "
 **** Exercise 2.3
 Let's do some experiment:
 #+BEGIN_SRC sml
@@ -172,3 +172,110 @@ As consequence, ~fun f~ also need not to be constrained.
 On the other hands, the last one need to be constrained; ML can not deduce the
 type of argument as ~*~ is overloaded function,i.e. it can be used with integer
 as real as well.
+*** Strings and characters
+**** Exercise 2.4
+- First version of function digit:
+  #+BEGIN_SRC sml
+fun digit i = chr(i + ord #"0");
+  #+END_SRC
+
+  #+RESULTS:
+  : val digit = fn : int -> char
+  : END
+
+- Second version of function digit:
+  #+BEGIN_SRC sml
+fun digit i = String.sub("0123456789", i);
+  #+END_SRC
+
+  #+RESULTS:
+  : [autoloading]
+  : [library $SMLNJ-BASIS/basis.cm is stable]
+  : [library $SMLNJ-BASIS/(basis.cm):basis-common.cm is stable]
+  : [autoloading done]
+  : val digit = fn : int -> char
+  : END
+
+
+I expect when we call the ~digit ~1~ in the second version of it, it should
+returns error that says "invalid index" or something like that or it could
+return "9" like python; but the function call of ~digit 10~ should raise invalid
+index error without another choice.
+
+On the other hand, the former may not raise error in ~digit 10~ call because it
+obviously ranges in ASCII character set; but the other one should raise error as
+I think the ASCII character set doesn't accept the negative character code.
+
+So, let's check:
+#+BEGIN_SRC sml
+digit ~1;
+digit 10;
+#+END_SRC
+
+#+RESULTS:
+:
+: uncaught exception Subscript [subscript out of bounds]
+: raised at: stdIn:10.15-10.25
+
+Uh-oh, the function call ~digit ~1~ of first version did not raise the error it
+returns ~"/"~; it turns out accept negative integer as its code! Interesting.
+And as expected the ~digit 10~ returns ~":"~ not error.
+
+How about the second one?; which raises error says "uncaught exception Subscript [subscript out of bounds]
+" in both case as expected. Not like python huh.
+
+*** Truth values and conditional expressions
+**** Exercise 2.5
+#+BEGIN_SRC sml
+(m = "January" orelse m = "March" orelse m = "May" orelse m = "July" orelse m = "September" orelse m = "Nobember")
+ andalso (0 < d andalso d < 32) orelse
+ (m = "April" orelse m = "June" orelse m = "August" orelse m = "October" orelse m = "December") andalso
+ (0 < d andalso d < 31) orelse (m = "February" andalso (0 < d andalso d < 29))
+#+END_SRC
+
+#+RESULTS:
+: val it = true : bool
+: END
+*** Functions with multiple arguments and results
+**** Exercise 2.6
+To name it easily we use the abbreviation ~mytime~ as tuple of ~(hours, minutes, AM or PM)~:
+#+BEGIN_SRC sml
+type mytime = int * int * string;
+#+END_SRC
+
+#+RESULTS:
+: type mytime = int * int * string
+: END
+Then we can define predicate which determine whether one time of day, in form of
+~mytime~, comes before another. The behavior of it should follows
+#+BEGIN_SRC sml
+(11, 59, "AM") precedes (1, 15, "PM");
+#+END_SRC
+
+We can easily implement it:
+#+BEGIN_SRC sml
+fun isPrecedes((h1, m1, N1):mytime, (h2, m2, N2)) =
+    (N1 = "AM" andalso N2 = "PM") orelse (h1 < h2) orelse (m1 < m2)
+#+END_SRC
+
+#+RESULTS:
+: val isPrecedes = fn : mytime * (int * int * string) -> bool
+: END
+**** Exercise 2.7
+#+BEGIN_SRC sml
+type oldEngMoney = int * int * int;
+fun oldEngMoneyAdd((po1,s1,pe1), (po2,s2,pe2)) =
+    let val amount = ((po1 + po2)*20 + s1 + s2)* 12 + pe1 + pe2
+    in (amount div (20 * 12), (amount mod (20 * 12)) div 12, amount mod 12)
+    end
+
+fun oldEngNeg(po, s, pe): oldEngMoney = (~po, ~s, ~pe)
+fun oldEngMoneySub(money1, money2) = oldEngMoneyAdd(money1, oldEngNeg money2)
+#+END_SRC
+
+#+RESULTS:
+: type oldEngMoney = int * int * int
+: val oldEngMoneyAdd = fn : (int * int * int) * (int * int * int) -> oldEngMoney
+: val oldEngNeg = fn : int * int * int -> oldEngMoney
+: val oldEngMoneySub = fn : (int * int * int) * (int * int * int) -> oldEngMoney
+: END
