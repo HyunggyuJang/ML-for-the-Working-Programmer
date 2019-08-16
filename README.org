@@ -236,6 +236,7 @@ How about the second one?; which raises error says "uncaught exception Subscript
 #+RESULTS:
 : val it = true : bool
 : END
+
 *** Functions with multiple arguments and results
 **** Exercise 2.6
 To name it easily we use the abbreviation ~mytime~ as tuple of ~(hours, minutes, AM or PM)~:
@@ -246,6 +247,7 @@ type mytime = int * int * string;
 #+RESULTS:
 : type mytime = int * int * string
 : END
+
 Then we can define predicate which determine whether one time of day, in form of
 ~mytime~, comes before another. The behavior of it should follows
 #+BEGIN_SRC sml
@@ -261,6 +263,7 @@ fun isPrecedes((h1, m1, N1):mytime, (h2, m2, N2)) =
 #+RESULTS:
 : val isPrecedes = fn : mytime * (int * int * string) -> bool
 : END
+
 **** Exercise 2.7
 #+BEGIN_SRC sml
 type oldEngMoney = int * int * int;
