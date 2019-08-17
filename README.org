@@ -1,6 +1,4 @@
 #+TITLE: ML for the Working Programmer
-#+OPTIONS: tex:t
-#+HTML_MATHJAX:  path:"http://cdn.mathjax.org/mathjax/latest/MathJax.js"
 
 * Why SML?
 For me, it is due to learning Isabelle more effectively; and also as I'm doing
@@ -286,7 +284,7 @@ fun oldEngMoneySub(money1, money2) = oldEngMoneyAdd(money1, oldEngNeg money2)
 : END
 *** Raising to an integer power
 **** Exercise 2.12
-
+#+BEGIN_SRC latex
 \begin{align}
 2.0^{29} &= 2.0 \times 2.0^{28} \\
 &= 2.0 \times 4.0^{14} \\
@@ -299,6 +297,23 @@ fun oldEngMoneySub(money1, money2) = oldEngMoneyAdd(money1, oldEngNeg money2)
 &= 2.0 \times 268435456.0 \\
 &= 536870912.0
 \end{align}
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{align}
+2.0^{29} &= 2.0 \times 2.0^{28} \\
+&= 2.0 \times 4.0^{14} \\
+&= 2.0 \times 16.0^{7} \\
+&= 2.0 \times (16.0 \times 16.0^{6}) \\
+&= 2.0 \times (16.0 \times 256.0^{3}) \\
+&= 2.0 \times (16.0 \times (256.0 \times 256.0^{2})) \\
+&= 2.0 \times (16.0 \times (256.0 \times 65536.0)) \\
+&= 2.0 \times (16.0 \times 16777216.0) \\
+&= 2.0 \times 268435456.0 \\
+&= 536870912.0
+\end{align}
+#+end_export
 
 **** Exercise 2.13
 The number of multiplications needed to compute ~power(x,k)~ is the number of
