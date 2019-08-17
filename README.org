@@ -351,12 +351,12 @@ We can prove that the steps needed are less than 2^{n} and greather than
 To compute the exact number of steps needed for /F_{n}/, we need to solve the
 linear discrete differential equation:
 
-#+BEGIN_EXPORT latex
+#+BEGIN_LaTeX
 \begin{align}
 f_{n} &= f_{n-1} + f_{n-2} + 2 &\text{for }n > 1 \\
 f_{n} &= 1 &\text{for }n < 2
 \end{align}
-#+END_EXPORT
+#+END_LaTeX
 
 
 It is worth to solve eagerously; but I've done with in [[github:HyunggyuJang/SICP][SICP]]. So I like to skip
