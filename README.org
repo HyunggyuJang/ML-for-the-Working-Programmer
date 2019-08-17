@@ -377,3 +377,38 @@ By reduction step, we know that /itfib(n+1, F_{k-1}, F_{k})/ \to
 /itfib(n, F_{k}, F_{k+1})/. Based on this, we can reason or observe by
 experimenting some examples that /itfib(n,F_{k-1}, F_{k})/ \to
 /F_{k+n-1}/. We can prove this fact by induction on n.
+
+**** Exercise 2.18
+Code iterative process of following process:
+#+BEGIN_SRC sml
+fun increase(k,n) = if (k+1)*(k+1) > n then k else k + 1;
+
+fun introot n =
+    if n = 0 then 0 else increase(2 * introot(n div 4), n);
+#+END_SRC
+
+#+BEGIN_SRC scheme
+(define (quaternary n bit)
+  (if (= n 0)
+      bit
+      (quaternary (quotient n 4) (cons (modulo n 4) bit))))
+
+(define (increase root bit number)
+  (if (null? bit)
+      root
+      (let ((next-root (* 2 root))
+            (next-number (+ number (car bit)))
+            (next-bit (cdr bit)))
+        (if (> (square(1+ next-root))
+               (next-number))
+            (increase next-number next-bit (* 4 next-number))
+            (increase (1+ next-root) next-bit (* 4 next-number))))))
+
+(define (introot n)
+  (increase 0 (quaternary n '()) 0))
+#+END_SRC
+
+This is the iterative process of ~introot~. We exploit the fact that ~introot~
+is somewhat analogous to ~fast-expt~; whereas ~fast-expt~ look only the one bit
+of number--represented by binary number, it need to look more than
+that--sequence of quaternary number.

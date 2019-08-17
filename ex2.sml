@@ -18,3 +18,9 @@ fun power(x,k) : real =
 fun fib n: int =
     if n < 2 then n
     else fib (n-1) + fib (n-2);
+
+(* Exercise 2.18 *)
+fun increase(k,n) = if (k+1)*(k+1) > n then k else k + 1;
+
+fun introot n =
+    if n = 0 then 0 else increase(2 * introot(n div 4), n);
