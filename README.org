@@ -399,10 +399,13 @@ fun introot n =
       (let ((next-root (* 2 root))
             (next-number (+ number (car bit)))
             (next-bit (cdr bit)))
-        (if (> (square(1+ next-root))
-               (next-number))
-            (increase next-number next-bit (* 4 next-number))
-            (increase (1+ next-root) next-bit (* 4 next-number))))))
+        (increase
+         (if (> (square(1+ next-root))
+                (next-number))
+             next-root
+             (1+ next-root))
+         next-bit
+         (* 4 next-number)))))
 
 (define (introot n)
   (increase 0 (quaternary n '()) 0))
