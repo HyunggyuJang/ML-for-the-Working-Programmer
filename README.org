@@ -282,3 +282,64 @@ fun oldEngMoneySub(money1, money2) = oldEngMoneyAdd(money1, oldEngNeg money2)
 : val oldEngNeg = fn : int * int * int -> oldEngMoney
 : val oldEngMoneySub = fn : (int * int * int) * (int * int * int) -> oldEngMoney
 : END
+*** Raising to an integer power
+**** Exercise 2.12
+\begin{align}
+2.0^{29} &= 2.0 \times 2.0^{28} \\
+&= 2.0 \times 4.0^{14} \\
+&= 2.0 \times 16.0^{7} \\
+&= 2.0 \times (16.0 \times 16.0^{6}) \\
+&= 2.0 \times (16.0 \times 256.0^{3}) \\
+&= 2.0 \times (16.0 \times (256.0 \times 256.0^{2})) \\
+&= 2.0 \times (16.0 \times (256.0 \times 65536.0)) \\
+&= 2.0 \times (16.0 \times 16777216.0) \\
+&= 2.0 \times 268435456.0 \\
+&= 536870912.0
+\end{align}
+
+**** Exercise 2.13
+The number of multiplications needed to compute ~power(x,k)~ is the number of
+binary digit representing it plus the number of 1s in its binary digit except
+the leftmost one.
+
+So at most, the number of multiplications of it is 2 \times \log_{2} k - 1.
+
+**** Exercise 2.14
+Because we chose using ~div~ also in odd power reduction case, if we set the
+base case as ~k=0~ and remain the else, then when it comes to ~k=1~ it falls in
+infinite loop at odd case reduction as ~1 div 2 = 1~.
+
+**** Exercise 2.15
+The recursive definition of /F_{n}/ would be like this:
+#+BEGIN_SRC sml
+fun fib n: int =
+    if n < 2 then n
+    else fib (n-1) + fib (n-2);
+#+END_SRC
+
+In the above definition, we can not distinguish whether it is strict or
+call-by-name rule evaluation; both results to exponential time complexity.
+On the other hand, the lazy evaluation could help this situation: It could be
+thought as memoization; it has same structure as /nextfib/.
+
+So, lazy evaluation big win here.
+
+**** Exercise 2.16
+We can prove that the steps needed are less than 2^{n} and greather than
+2^{n/2}. As consequence it inherite exponential step complexity.
+
+To compute the exact number of steps needed for /F_{n}/, we need to solve the
+linear discrete differential equation:
+\begin{align}
+f_{n} &= f_{n-1} + f_{n-2} + 2 &\text{for }n > 1 \\
+f_{n} &= 1 &\text{for }n < 2
+\end{align}
+
+It is worth to solve eagerously; but I've done with in [[github:HyunggyuJang/SICP][SICP]]. So I like to skip
+this step.
+
+**** Exercise 2.17
+By reduction step, we know that /itfib(n+1, F_{k-1}, F_{k})/ \to
+/itfib(n, F_{k}, F_{k+1}/. Based on this, we can reason or observe by
+experimenting some examples that /itfib(n,F_{k-1}, F_{k}/ \to
+/F_{k+n-1}/. We can prove this fact by induction on n.

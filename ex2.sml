@@ -3,7 +3,18 @@ type oldEngMoney = int * int * int;
 fun oldEngMoneyAdd((po1,s1,pe1), (po2,s2,pe2)) =
     let val amount = ((po1 + po2)*20 + s1 + s2)* 12 + pe1 + pe2
     in (amount div (20 * 12), (amount mod (20 * 12)) div 12, amount mod 12)
-    end
+    end;
 
-fun oldEngNeg(po, s, pe): oldEngMoney = (~po, ~s, ~pe)
-fun oldEngMoneySub(money1, money2) = oldEngMoneyAdd(money1, oldEngNeg money2)
+fun oldEngNeg(po, s, pe): oldEngMoney = (~po, ~s, ~pe);
+fun oldEngMoneySub(money1, money2) = oldEngMoneyAdd(money1, oldEngNeg money2);
+
+(* Exercise 2.12 ~ 14 *)
+fun power(x,k) : real =
+    if k=1 then x
+    else if k mod 2 = 0 then power(x*x, k div 2)
+    else x * power(x*x, k div 2);
+
+(* Exercise 2.15 *)
+fun fib n: int =
+    if n < 2 then n
+    else fib (n-1) + fib (n-2);
