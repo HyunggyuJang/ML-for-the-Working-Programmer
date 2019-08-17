@@ -282,6 +282,7 @@ fun oldEngMoneySub(money1, money2) = oldEngMoneyAdd(money1, oldEngNeg money2)
 : val oldEngNeg = fn : int * int * int -> oldEngMoney
 : val oldEngMoneySub = fn : (int * int * int) * (int * int * int) -> oldEngMoney
 : END
+
 *** Raising to an integer power
 **** Exercise 2.12
 
