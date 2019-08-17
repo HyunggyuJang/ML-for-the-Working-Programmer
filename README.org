@@ -284,6 +284,7 @@ fun oldEngMoneySub(money1, money2) = oldEngMoneyAdd(money1, oldEngNeg money2)
 : END
 *** Raising to an integer power
 **** Exercise 2.12
+
 #+BEGIN_SRC latex
 \begin{align}
 2.0^{29} &= 2.0 \times 2.0^{28} \\
@@ -349,10 +350,13 @@ We can prove that the steps needed are less than 2^{n} and greather than
 To compute the exact number of steps needed for /F_{n}/, we need to solve the
 linear discrete differential equation:
 
+#+BEGIN_EXPORT latex
 \begin{align}
 f_{n} &= f_{n-1} + f_{n-2} + 2 &\text{for }n > 1 \\
 f_{n} &= 1 &\text{for }n < 2
 \end{align}
+#+END_EXPORT
+
 
 It is worth to solve eagerously; but I've done with in [[github:HyunggyuJang/SICP][SICP]]. So I like to skip
 this step.
