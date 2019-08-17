@@ -288,16 +288,16 @@ fun oldEngMoneySub(money1, money2) = oldEngMoneyAdd(money1, oldEngNeg money2)
 
 #+BEGIN_SRC latex
 \begin{align}
-2.0^{29} &= 2.0 \times 2.0^{28} \\
-&= 2.0 \times 4.0^{14} \\
-&= 2.0 \times 16.0^{7} \\
-&= 2.0 \times (16.0 \times 16.0^{6}) \\
-&= 2.0 \times (16.0 \times 256.0^{3}) \\
-&= 2.0 \times (16.0 \times (256.0 \times 256.0^{2})) \\
-&= 2.0 \times (16.0 \times (256.0 \times 65536.0)) \\
-&= 2.0 \times (16.0 \times 16777216.0) \\
-&= 2.0 \times 268435456.0 \\
-&= 536870912.0
+  2.0^{29} &= 2.0 \times 2.0^{28} \\
+  &= 2.0 \times 4.0^{14} \\
+  &= 2.0 \times 16.0^{7} \\
+  &= 2.0 \times (16.0 \times 16.0^{6}) \\
+  &= 2.0 \times (16.0 \times 256.0^{3}) \\
+  &= 2.0 \times (16.0 \times (256.0 \times 256.0^{2})) \\
+  &= 2.0 \times (16.0 \times (256.0 \times 65536.0)) \\
+  &= 2.0 \times (16.0 \times 16777216.0) \\
+  &= 2.0 \times 268435456.0 \\
+  &= 536870912.0
 \end{align}
 #+END_SRC
 
@@ -326,8 +326,10 @@ So at most, the number of multiplications of it is 2 \times \log_{2} k - 1.
 
 **** Exercise 2.14
 Because we chose using ~div~ also in odd power reduction case, if we set the
-base case as ~k=0~ and remain the else, then when it comes to ~k=1~ it falls in
-infinite loop at odd case reduction as ~1 div 2 = 1~.
+base case as ~k=0~ and maintain the else unchanged, then when it comes to ~k=1~,
+it should calculate ~x * x~, which never used for returning value and also the
+most expensive multiplication in that process. To avoid it, we should take ~k=1~
+as base case.
 
 **** Exercise 2.15
 The recursive definition of /F_{n}/ would be like this:
@@ -351,12 +353,20 @@ We can prove that the steps needed are less than 2^{n} and greather than
 To compute the exact number of steps needed for /F_{n}/, we need to solve the
 linear discrete differential equation:
 
-#+BEGIN_LaTeX
+#+BEGIN_SRC latex
 \begin{align}
 f_{n} &= f_{n-1} + f_{n-2} + 2 &\text{for }n > 1 \\
 f_{n} &= 1 &\text{for }n < 2
 \end{align}
-#+END_LaTeX
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{align}
+f_{n} &= f_{n-1} + f_{n-2} + 2 &\text{for }n > 1 \\
+f_{n} &= 1 &\text{for }n < 2
+\end{align}
+#+end_export
 
 
 It is worth to solve eagerously; but I've done with in [[github:HyunggyuJang/SICP][SICP]]. So I like to skip
