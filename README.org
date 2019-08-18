@@ -439,3 +439,44 @@ To compare with Euclid's Algorithm, we consider the following example:
 Can we prove that Euclid's Algorithm is always more efficient than given? The
 given algorithm quite subtle so I think it is not easy to prove in this point.
 After we gathered right instruments, we should try it not now.
+
+**** Exercise 2.20
+If we decide to nest ~itfib~ in ~fib~, then every call of fib should redefine
+~itfib~ which is obvious overhead; in ~sqroot~ function, ~findroot~ depends on
+the parameter of ~sqroot~, ~a~ and ~acc~ which does not change over the
+iteration process, whereas ~itfib~ alter its parameters during iteration. So it
+is ideal to define ~itfib~ using ~local~.
+**** Exercise 2.21
+I admit that I couldn't fully understand the statement of this exercise; but
+code it was irrelevant with it. I can not be sure whether the author intended
+it, anyway I did it:
+#+BEGIN_SRC sml
+fun introot n =
+    if n=0 then 0 else
+    let val k = 2 * introot(n div 4) + 1
+    in if k * k > n then k - 1 else k
+    end;
+#+END_SRC
+*** Simultaneous declarations
+In ML, the function definition capture the environment when it defined; so it
+need special syntax for mutual recursion:
+#+BEGIN_SRC sml
+fun pos d = neg(d - 2.0) + 1.0/d
+and neg d = if d>0.0 then pos(d-2.0) - 1.0/d
+                     else 0.0;
+#+END_SRC
+
+Whereas, in scheme procedure definition did not bind its free variable when it
+defined--it is called erroneously /closure/ property; there is no concept like
+mutual recursion or special syntax for it, the above function definition can be
+achieved likely:
+#+BEGIN_SRC scheme
+(define (pos d)
+  (+ (neg (- d 2.0))
+     (/ 1.0 d)))
+(define (neg d)
+  (if (> d 0)
+      (- (pos (- d 2.0))
+         (/ 1.0 d))
+      0.0))
+#+END_SRC

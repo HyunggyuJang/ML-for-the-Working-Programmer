@@ -34,3 +34,10 @@ fun gcd(m,n) =
     else if m mod 2 = 0
     then gcd(m div 2, n)
     else gcd(n div 2, m);
+
+(* Exercise 2.21 *)
+fun introot n =
+    if n=0 then 0 else
+    let val k = 2 * introot(n div 4) + 1
+    in if k * k > n then k - 1 else k
+    end;
