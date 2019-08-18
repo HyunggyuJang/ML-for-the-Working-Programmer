@@ -43,7 +43,7 @@ fun gcd(m,n) =
 fun introotpair n =
     if n < 4 then (1, n - 1)    (* base case *)
     else
-        let val (i, dif) = introotpair (n div 4) (* wishful thinking assume we'v got *)
+        let val (i, dif) = introotpair (n div 4) (* wishful thinking assume we've got *)
             val (k_1, dif_1) = (2*i, (n mod 4) + 4 * dif)
             val (k_2, dif_2) = (k_1 + 1, dif_1 - 2 * k_1 - 1)
         in
