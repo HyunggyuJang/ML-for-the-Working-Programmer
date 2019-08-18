@@ -480,3 +480,57 @@ achieved likely:
          (/ 1.0 d))
       0.0))
 #+END_SRC
+**** Exercise 2.22
+It would swap the values because the left hand side of declaration only rewrite
+its value after evaluated right hand side expressions.
+**** Exercise 2.23
+#+BEGIN_SRC sml
+fun P n =
+    if n = 1 then 1
+    else 1 + P (n-1);
+#+END_SRC
+It has linear complexity in both space and time. As we can prove the ~fun P n =
+n~ by induction on n, it is way more faster to define like that than above.
+**** Exercise 2.24
+We can exploit the fact that ~fun~ is syntactic sugar for ~val~:
+#+BEGIN_SRC sml
+structure Real : ARITH =
+struct
+type t = real;
+val zero = 0.0;
+val sum : t * t -> t= op+;
+val diff : t * t -> t= op-;
+val prod : t * t -> t= op*;
+val quo = op/;
+end;
+#+END_SRC
+**** Exercise 2.25
+Rational number arithmetic:
+#+BEGIN_SRC sml
+structure Rational : ARITH =
+struct
+type t = int * int;
+val zero = (0, 1);
+fun make_rat (n',d') =
+    let val g = gcd(n', d')
+        val (n, d) = (n' div g, d' div g)
+    in
+        if (n > 0 andalso d < 0) (* make denominator positive *)
+               (* orelse (n < 0 andalso d < 0) *)
+               (* ↑ this is can not happen by dividing gcd both side *)
+        then (~n, ~d)
+        else (n, d)
+    end;
+fun sum ((n,d), (n',d')) = make_rat(n * d' + n' * d, d * d');
+fun neg (n,d) : t = (~n, d);
+fun diff (r, r') = sum(r, neg r');
+fun prod ((n,d), (n',d')) = make_rat(n*n', d*d');
+fun recip (n, d) : t = (d, n);
+fun quo (r, r') = prod (r, recip r');
+end
+#+END_SRC
+
+As I commented, in the ~make_rat~ function definition, the ~orelse~ clause never
+be evaluated as ~true~. So I've omitted it. At first glimpse it is not obvious
+why; so maybe I shouldn't omit it for clarity of code. This is one's preference;
+I like it.
