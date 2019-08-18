@@ -40,11 +40,17 @@ fun gcd(m,n) =
     else gcd(n mod m, m);
 
 (* Exercise 2.21 *)
-fun introot n =
-    if n=0 then 0 else
-    let val k = 2 * introot(n div 4) + 1
-    in if k * k > n then k - 1 else k
-    end;
+fun introotpair n =
+    if n < 4 then (1, n - 1)    (* base case *)
+    else
+        let val (i, dif) = introotpair (n div 4) (* wishful thinking assume we'v got *)
+            val (k_1, dif_1) = (2*i, (n mod 4) + 4 * dif)
+            val (k_2, dif_2) = (k_1 + 1, dif_1 - 2 * k_1 - 1)
+        in
+            if dif_2 < 0
+            then (k_1, dif_1)
+            else (k_2, dif_2)
+        end;
 
 (* Exercise 2.22 *)
 val pi = 4.0 * Math.atan 1.0

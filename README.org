@@ -447,16 +447,59 @@ the parameter of ~sqroot~, ~a~ and ~acc~ which does not change over the
 iteration process, whereas ~itfib~ alter its parameters during iteration. So it
 is ideal to define ~itfib~ using ~local~.
 **** Exercise 2.21
-I admit that I couldn't fully understand the statement of this exercise; but
-code it was irrelevant with it. I can not be sure whether the author intended
-it, anyway I did it:
+Now I've got it what the statement intended: The point was ~introot~ maps /n/ to
+its integer square root /k/ with the difference /n - k^{2}/; namely /n/ \to
+/(k, n - k^{2}/ with /eliminating squaring operation/. Let's put the base case
+first; and then put all the pieces together.
+
+We can start with this:
 #+BEGIN_SRC sml
-fun introot n =
-    if n=0 then 0 else
-    let val k = 2 * introot(n div 4) + 1
-    in if k * k > n then k - 1 else k
-    end;
+fun introotpair n =
+    if n < 4 then (1, n - 1)    (* base case *)
+    else
+        let val (i, dif) = introotpair (n div 4) (* wishful thinking assume we'v got *)
+...
 #+END_SRC
+
+Then from the recursive step, we need to check
+- whether n - (2i + 1)^{2} < 0; if it is then 2i would be integer root of n,
+  otherwise 2i + 1.
+
+
+Then we should maps this /2i/ and /n - (2i + 1)^{2} < 0/ in terms of ~i~,
+~dif~ and /n/, where ~dif~ is m - i^{2}. We can solve this by observing that
+- n - (2i + 1)^{2} = n - 4m + 4(m - i^{2}) - 4i - 1 = n - 4m + 4 ~dif~ - 4 ~i~ - 1
+- n - 4m = ~n - 4 (n div 4)~ = ~n mod 4~
+
+
+We converted as wanted. By putting together, we get
+#+BEGIN_SRC sml
+fun introotpair n =
+    if n < 4 then (1, n - 1)    (* base case *)
+    else
+        let val (i, dif) = introotpair (n div 4) (* wishful thinking assume we'v got *)
+        in
+            if (n mod 4) + 4 * dif - 4 * i - 1 < 0
+            then (2*i, (n mod 4) + 4 * dif)
+            else (2*i + 1, (n mod 4) + 4 * dif - 4 * i - 1)
+        end;
+#+END_SRC
+
+Removing the duplicative evaluation, we get
+#+BEGIN_SRC sml
+fun introotpair n =
+    if n < 4 then (1, n - 1)    (* base case *)
+    else
+        let val (i, dif) = introotpair (n div 4) (* wishful thinking assume we'v got *)
+            val (k_1, dif_1) = (2*i, (n mod 4) + 4 * dif)
+            val (k_2, dif_2) = (k_1 + 1, dif_1 - 2 * k_1 - 1)
+        in
+            if dif_2 < 0
+            then (k_1, dif_1)
+            else (k_2, dif_2)
+        end;
+#+END_SRC
+
 *** Simultaneous declarations
 In ML, the function definition capture the environment when it defined; so it
 need special syntax for mutual recursion:
