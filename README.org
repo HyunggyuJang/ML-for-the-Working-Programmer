@@ -498,7 +498,8 @@ and sum_P n =
 As this process evolve interwindly, we can prove that its step complextity is
 exponential[fn:1] whereas space complextity is linear with repect to ~n~.
 Also, we can optain the closed form of its return value, 2^{n-1} by solving
-discrete linear differential equation with repect to ~sum_P~.
+discrete linear differential equation with repect to ~sum_P~. In turns, this
+closed form can be calculated in \log_{2} n complexity of steps by using ~fast-expt~.
 **** Exercise 2.24
 We can exploit the fact that ~fun~ is syntactic sugar for ~val~:
 #+BEGIN_SRC sml
