@@ -484,13 +484,21 @@ achieved likely:
 It would swap the values because the left hand side of declaration only rewrite
 its value after evaluated right hand side expressions.
 **** Exercise 2.23
+Let's code it directly: for the summation notation, declare auxilary function
+named ~sum_P~. As both function are mutually dependent, we should use
+simultaneous declaration:
 #+BEGIN_SRC sml
 fun P n =
     if n = 1 then 1
-    else 1 + P (n-1);
+    else 1 + sum_P (n-1)
+and sum_P n =
+    if n = 0 then 0
+    else P n + sum_P (n-1);
 #+END_SRC
-It has linear complexity in both space and time. As we can prove the ~fun P n =
-n~ by induction on n, it is way more faster to define like that than above.
+As this process evolve interwindly, we can prove that its step complextity is
+exponential[fn:1] whereas space complextity is linear with repect to ~n~.
+Also, we can optain the closed form of its return value, 2^{n-1} by solving
+discrete linear differential equation with repect to ~sum_P~.
 **** Exercise 2.24
 We can exploit the fact that ~fun~ is syntactic sugar for ~val~:
 #+BEGIN_SRC sml
@@ -557,3 +565,7 @@ By the type checking rule for conditional expression, ~f(k-1)~ has ~int~ type.
 As ~k=0~ implies ~k~ is integer, ~f(k-1)~ means that it called with argument
 type ~int~; but the function declaration denotes ~f~ should take pair as its
 argument. So it end up with compilation error.
+
+* Footnotes
+
+[fn:1] By comparing with the recursive vesion of ~fib~.

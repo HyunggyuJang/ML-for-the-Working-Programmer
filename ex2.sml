@@ -54,7 +54,10 @@ val (pi, log2) = (log2, pi);
 (* Exercise 2.23 *)
 fun P n =
     if n = 1 then 1
-    else 1 + P (n-1);
+    else 1 + sum_P (n-1)
+and sum_P n =
+    if n = 0 then 0
+    else P n + sum_P (n-1);
 
 (* Structures *)
 structure Complex =
