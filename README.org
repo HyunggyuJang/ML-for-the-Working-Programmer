@@ -534,3 +534,26 @@ As I commented, in the ~make_rat~ function definition, the ~orelse~ clause never
 be evaluated as ~true~. So I've omitted it. At first glimpse it is not obvious
 why; so maybe I shouldn't omit it for clarity of code. This is one's preference;
 I like it.
+**** Exercise 2.26
+From the ~if n=1 then curr~ we (compiler) can infer that ~n~ is type of ~int~
+and also that ~curr~ has ~int~ type by type constraints of ~itfib~. As
+consequence, by ~prev + curr~ the ~prev~ also should have ~int~ type, ~itfib~'s
+type are determined as ~int * int * int -> int~.
+**** Exercise 2.27
+Type check the following function declaration:
+#+BEGIN_SRC sml
+fun f (k,m) = if k=0 then 1 else f(k-1);
+#+END_SRC
+
+#+RESULTS:
+: stdIn:21.34-21.40 Error: operator and operand do not agree [overload conflict]
+: operator domain: [- ty] * 'Z
+: operand:         [- ty]
+: in expression:
+: f (k - 1)
+: END
+
+By the type checking rule for conditional expression, ~f(k-1)~ has ~int~ type.
+As ~k=0~ implies ~k~ is integer, ~f(k-1)~ means that it called with argument
+type ~int~; but the function declaration denotes ~f~ should take pair as its
+argument. So it end up with compilation error.
