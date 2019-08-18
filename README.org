@@ -609,6 +609,62 @@ By the type checking rule for conditional expression, ~f(k-1)~ has ~int~ type.
 As ~k=0~ implies ~k~ is integer, ~f(k-1)~ means that it called with argument
 type ~int~; but the function declaration denotes ~f~ should take pair as its
 argument. So it end up with compilation error.
+** Chapter 3
+*** Testing lists and taking them apart
+**** Exercise 3.1
+We can code directly:
+#+BEGIN_SRC sml
+fun maxl l : int  =
+    if null (tl l) then hd l
+    else
+        let val m = hd l
+            val n = hd (tl l)
+            val ntl = tl (tl l)
+        in
+            if m > n then maxl (m :: ntl)
+            else maxl (n :: ntl)
+        end;
+#+END_SRC
+**** Exercise 3.2
+Using pattern matching, it can defined concisely:
+#+BEGIN_SRC sml
+fun last [e] = e
+  | last (_ :: es) = last es;
+#+END_SRC
+**** Exercise 3.3
+#+BEGIN_SRC sml
+fun take ([], _) = []
+  | take (x::xs, i) =
+    if i > 0 then x :: take (xs, i - 1)
+    else [];
+
+fun drop ([], _) = []
+  | drop (x::xs, i) =
+    if i > 0 then drop (xs, i - 1)
+    else x::xs;
+#+END_SRC
+- When i > /length(l)/ then, by the first clause of pattern matching, ~take~
+  would return /l/; whereas ~drop~ return ~[]~.
+- And if i < 0 then, ~take~ returns ~[]~ and ~drop~ return /l/ by second clause
+  of those.
+**** Exercise 3.4
+#+BEGIN_SRC sml
+fun nth (x::xs, n) =
+    if n > 0 then nth (xs, n - 1)
+    else x;
+#+END_SRC
+**** Exercise 3.5
+All we needed to do is append given case explicitly:
+#+BEGIN_SRC sml
+infixr 5 @;
+fun ([] @ ys) = ys
+  | (xs @ [])  = xs
+  | ((x::xs) @ ys) = x :: (xs @ ys);
+#+END_SRC
+**** Exercise 3.6
+It will complain about the type inconsistence; ~@~ expect to take 2 list with
+the same type by the last clause of its definition, the ~x~, element type of list
+of ~xs~, is not the case.
 
 * Footnotes
 
