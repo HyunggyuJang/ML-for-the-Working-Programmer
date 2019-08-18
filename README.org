@@ -415,3 +415,27 @@ This is the iterative process of ~introot~. We exploit the fact that ~introot~
 is somewhat analogous to ~fast-expt~; whereas ~fast-expt~ look only the one bit
 of number--represented by binary number, it need to look more than
 that--sequence of quaternary number.
+
+**** Exercise 2.19
+We can code this algorithm:
+#+BEGIN_SRC sml
+fun gcd(m,n) =
+    if m=n then m
+    else if m mod 2 = 0 andalso n mod 2 = 0
+    then 2 * gcd(m div 2, n div 2)
+    else if m mod 2 = 1 andalso n mod 2 = 1
+    then if m < n then gcd((n-m) div 2, m) else gcd((m-n) div 2, n)
+    else if m mod 2 = 0
+    then gcd(m div 2, n)
+    else gcd(n div 2, m);
+#+END_SRC
+
+To compare with Euclid's Algorithm, we consider the following example:
+~gcd(5499, 6812)~
+- In Euclid's Algorithm, as did in text book, it require 6 steps.
+- On the other hand, the given algorithm we should take 13 steps for evaluating it.
+
+
+Can we prove that Euclid's Algorithm is always more efficient than given? The
+given algorithm quite subtle so I think it is not easy to prove in this point.
+After we gathered right instruments, we should try it not now.

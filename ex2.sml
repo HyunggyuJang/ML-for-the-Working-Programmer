@@ -24,3 +24,13 @@ fun increase(k,n) = if (k+1)*(k+1) > n then k else k + 1;
 
 fun introot n =
     if n = 0 then 0 else increase(2 * introot(n div 4), n);
+
+fun gcd(m,n) =
+    if m=n then m
+    else if m mod 2 = 0 andalso n mod 2 = 0
+    then 2 * gcd(m div 2, n div 2)
+    else if m mod 2 = 1 andalso n mod 2 = 1
+    then if m < n then gcd((n-m) div 2, m) else gcd((m-n) div 2, n)
+    else if m mod 2 = 0
+    then gcd(m div 2, n)
+    else gcd(n div 2, m);
