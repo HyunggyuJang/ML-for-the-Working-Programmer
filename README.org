@@ -665,6 +665,113 @@ fun ([] @ ys) = ys
 It will complain about the type inconsistence; ~@~ expect to take 2 list with
 the same type by the last clause of its definition, the ~x~, element type of list
 of ~xs~, is not the case.
+*** Making change
+**** Exercise 3.11
+We can achieve this using the structure of ~change~
+#+BEGIN_SRC sml
+local
+    val romans = ["M", "D", "C", "L", "X", "V", "I"];
+    val rNumers = [1000, 500, 100, 50, 10, 5, 1];
+    val romanPairs = ListPair.zip (romans, rNumers);
+    fun romanNumeral (romanvals, 0) = ""
+      | romanNumeral ((r,v) :: romanvals, amount) =
+        if amount < v then romanNumeral (romanvals, amount)
+        else r ^ romanNumeral ((r,v) :: romanvals, amount - v);
+in
+fun toRomanVerbose (amount) = romanNumeral(romanPairs, amount);
+end;
+
+(* or *)
+
+local
+    val romans = ["M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"];
+    val rNumers = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
+    val romanPairs = ListPair.zip (romans, rNumers);
+    fun romanNumeral (romanvals, 0) = ""
+      | romanNumeral ((r,v) :: romanvals, amount) =
+        if amount < v then romanNumeral (romanvals, amount)
+        else r ^ romanNumeral ((r,v) :: romanvals, amount - v);
+in
+fun toRomanConcise (amount) = romanNumeral(romanPairs, amount);
+end;
+#+END_SRC
+
+Here we implemented the two version of converting to Roman numerals.
+**** Exercise 3.12
+If it were increasing order, by the definition of ~change~, the result is same
+as if we gave the ~coinvals~ only includes the first coin value in the
+~coinvals~ in increasing order; e.g. if ~coinvals = [1, 5, 10, 25]~ then the
+~amount~ get converted to sequence of 1s.
+**** Exercise 3.13
+There are several possibilities in implementing this:
+- By changing the coinvals to purse, which can contains coins duplicately:
+  #+BEGIN_SRC sml
+fun allChangeWithPurse (coins, purse, 0) = [coins]
+  | allChangeWithPurse (coins, [], amount) = []
+  | allChangeWithPurse (coins, c :: purse, amount) =
+    if amount < 0 then []
+    else allChangeWithPurse(c :: coins, purse, amount - c) @
+         allChangeWithPurse(coins, purse, amount);
+  #+END_SRC
+  Unfortunately this not work; the result has some duplicative entries.
+- We can revise this by considering purse as ListPair that contains the pair of coin
+  values and number of that coins:
+  #+BEGIN_SRC sml
+fun allChangeWithPurse (coins, purse, 0) = [coins]
+  | allChangeWithPurse (coins, [], amount) = []
+  | allChangeWithPurse (coins, (c,n) :: purse, amount) =
+    if amount < 0 then []
+    else if n = 0 then allChangeWithPurse(coins, purse, amount)
+    else allChangeWithPurse(c :: coins, (c, n - 1) :: purse, amount - c) @
+         allChangeWithPurse(coins, purse, amount);
+  #+END_SRC
+**** Exercise 3.14
+We can solve this problem by relying on our old friend John; John did implement
+the function ~allChange~ with the following
+specification:
+- When we hand over the four parameters of it--~coins~, ~coinvals~, ~amount~,
+  ~results~, then it returns contains all the answers that can be obtained with
+  ~coins~ and ~coinvals~ as well as all contents of ~results~.
+- The way to merge all the answers with ~results~ is other than ~append~.
+
+
+With this armamentarium, we can tackle the recursive case:
+#+BEGIN_SRC sml
+  | allChange (coins, c :: coinvals, amount, results) =
+    if amount < 0 then []
+    else allChange(c :: coins,
+                   c :: coinvals,
+                   amount - c,
+                   allChange(coins, coinvals, amount, results));
+#+END_SRC
+
+By applying repeatedly this, we end up with base case:
+#+BEGIN_SRC sml
+fun allChange (coins, coinvals, 0, results) = coins :: results
+  | allChange (coins, [], amount, results) = results
+#+END_SRC
+Here we used ~::~ for combining the answer with ~results~ for specification.
+
+Then we complete the function:
+#+BEGIN_SRC sml
+fun allChange (coins, coinvals, 0, results) = coins :: results
+  | allChange (coins, [], amount, results) = results
+  | allChange (coins, c :: coinvals, amount, results) =
+    if amount < 0 then []
+    else allChange(c :: coins,
+                   c :: coinvals,
+                   amount - c,
+                   allChange(coins, coinvals, amount, results));
+#+END_SRC
+
+The most significant difference between this one and previous one is that the
+original can be parallelized in the recursive case, whereas above one is
+sequential--must wait until the second subproblem return; this observation also
+means the previous construct intermediate list for appending them (in parallel),
+on the otherwise in this one there are no list construction other than return value.
+
+As consequence, present version has deeper recursive process than previous where
+instead the intermediate lists costs more than this one.
 
 * Footnotes
 
