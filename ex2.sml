@@ -83,7 +83,7 @@ end;
 signature ARITH =
 sig
     type t
-    val zero :t
+    val zero : t
     val sum : t * t -> t
     val diff : t * t -> t
     val prod : t * t -> t

@@ -772,6 +772,313 @@ on the otherwise in this one there are no list construction other than return va
 
 As consequence, present version has deeper recursive process than previous where
 instead the intermediate lists costs more than this one.
+*** Binary arithmetic
+Binary addition and multiplication are defined here for lists of zeros and ones.
+
+**** Addition.
+Let's first inspect the rules that govern binary sum; do binary sum of 11 + 30 =
+41: 11110 + 1011 = 101001.
+
+We can elicit the rules:
+- Addition works from right to left.
+- At each position, the two bits plus any carry give a sum bit.
+- Any carry propagate as addition works, i.e. from right to left.
+
+
+To implement those rules in list, we should consider list as representing the
+reverse order of binary numbers; as list can be easily accessed with their head,
+whereas the last item costs a lot and hard to manage.
+
+Using observations so far, let's try out. As usual we rely on wishful thinking.
+#+BEGIN_SRC sml
+  | binsum (c, p :: ps, q :: qs) = ((c + p + q) mod 2) :: binsum((c + p + q) div 2, ps, qs)
+#+END_SRC
+
+Then we can reach the base case by applying the recursive process repeatedly:
+#+BEGIN_SRC sml
+fun binsum (c, [], qs) = ??
+  | binsum (c, ps, []) = ??
+#+END_SRC
+
+Either of this can be thought as /propagating carry along with one binary
+number/. It deserve to be assigned its own name. ~bincarry~ will do. Here also
+we start with recursive case. Let's do some experiment with this. What if ~c~
+equals zero? we just need return the ~ps~. How about ~c~ equals one? It will
+depend on the ~ps~; this would be the recursive case. Playing with some examples
+we can deduce following rules:
+#+BEGIN_SRC sml
+fun bincarry (0, ps) = ps
+  | bincarry (1, []) = [1]
+  | bincarry (1, p :: ps) = (1-p) :: bincarry (p, ps);
+#+END_SRC
+
+We captured the recursive case succinctly: ~(1 + p) mod 2~ is same as ~1-p~ and
+also ~(1 + p) div 2~ same as ~p~.
+
+Then we can complete ~binsum~:
+#+BEGIN_SRC sml
+fun binsum (c, [], qs) = bincarry (c, qs)
+  | binsum (c, ps, []) = bincarry (c, ps)
+  | binsum (c, p :: ps, q :: qs) = ((c + p + q) mod 2) :: binsum((c + p + q) div 2, ps, qs);
+#+END_SRC
+**** Multiplication.
+We can deduce the multiplication rules of binary number that is analogous to
+sum:
+#+BEGIN_SRC sml
+  | binprod (0::ps, qs) = 0::binprod(ps, qs)
+  | binprod (1::ps, qs) = binsum(0, qs, 0::binprod(ps, qs))
+#+END_SRC
+
+Then we end up with base case:
+#+BEGIN_SRC sml
+fun binprod ([], _) = []
+#+END_SRC
+
+As the whole
+#+BEGIN_SRC sml
+fun binprod ([], _) = []
+  | binprod (0::ps, qs) = 0::binprod(ps, qs)
+  | binprod (1::ps, qs) = binsum(0, qs, 0::binprod(ps, qs));
+#+END_SRC
+**** A structure for binary arithmetic.
+We can capture the binary arithmetic system using ~structure~ as we learned in
+section 2.22.
+#+BEGIN_SRC sml
+structure Bin =
+struct
+fun carry (0, ps) = ps
+  | carry (1, []) = [1]
+  | carry (1, p :: ps) = (1-p) :: carry (p, ps);
+
+fun sum (c, [], qs) = carry (c, qs)
+  | sum (c, ps, []) = carry (c, ps)
+  | sum (c, p :: ps, q :: qs) = ((c + p + q) mod 2) :: sum((c + p + q) div 2, ps, qs);
+
+fun prod ([], _) = []
+  | prod (0::ps, qs) = 0::prod(ps, qs)
+  | prod (1::ps, qs) = sum(0, qs, 0::prod(ps, qs));
+end
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+stdIn:41.5-43.51 Warning: match nonexhaustive
+(nil,_) => ...
+(0 :: ps,qs) => ...
+(1 :: ps,qs) => ...
+
+stdIn:33.5-35.48 Warning: match nonexhaustive
+(0,ps) => ...
+(1,nil) => ...
+(1,p :: ps) => ...
+
+structure Bin :
+sig
+val carry : int * int list -> int list
+val sum : int * int list * int list -> int list
+val prod : int list * int list -> int list
+end
+END
+#+end_example
+**** Exercise 3.15
+We can convert the 1 and 0s to boolean values using truth table. As consequence
+we don't need to use the arithmetic operations.
+#+BEGIN_SRC sml
+structure Bin =
+struct
+fun carry (false, ps) = ps
+  | carry (true, []) = [true]
+  | carry (true, p :: ps) = (not p) :: carry (p, ps);
+
+fun xor (b, b') = (b andalso not b') orelse (not b andalso b');
+
+fun sum (c, [], qs) = carry (c, qs)
+  | sum (c, ps, []) = carry (c, ps)
+  | sum (false, p :: ps, q :: qs) = xor (p, q) :: sum(p andalso q, ps, qs)
+  | sum (true, p :: ps, q :: qs) = (not xor (p, q)) :: sum(p orelse q, ps, qs);
+
+fun prod ([], _) = []
+  | prod (false::ps, qs) = false::prod(ps, qs)
+  | prod (true::ps, qs) = sum(false, qs, false::prod(ps, qs));
+end;
+#+END_SRC
+**** Exercise 3.16
+First we should define what the binary division means; let we define it as
+/binary version of integer division/. To deduce the rules for it, inspect the
+common pattern of integer division: Play with 41 / 3, and then do the bianry
+version--101001 / 11. Then we can elicit the how to rules:
+#+BEGIN_SRC sml
+fun quorem' (ps, qs, n, quot) =
+    if n < 0 then (quot, ps)
+    else let val qs' = zeroPed (qs, n)
+             val rem = diff (ps, qs')
+         in if (isNeg rem) then
+                if (null quot) then quorem' (ps, qs, n-1,quot)
+                else quorem' (ps, qs, n-1 0 :: quot)
+            else quorem' (ps, qs, n-1, 1 :: quot)
+         end;
+#+END_SRC
+As we learned from elementary school, here we also obtained quotient and
+remainder at the same time. Also note that we didn't implemented the auxilary
+functions--isNeg, zeroPed, diff; we just used wishful thinking. After implemnt
+it, we can call this with appropriate initial condition:
+#+BEGIN_SRC sml
+fun quorem (ps, qs) =
+    let val lp = length ps
+        val lq = length qs
+    in if lp < lq then (zero, ps)
+       else (quorem' (ps, qs, lp - lq, []))
+    end;
+#+END_SRC
+
+Since we coded our elementary knowledge into SML, all we have to do is implement
+the auxilary functions.
+
+***** ~diff~
+Analogous to ~quorem~, we can code the ~diff~ function directly:
+#+BEGIN_SRC sml
+local
+    fun diff_ (b, [], qs) = neg (carry (b, qs))
+      | diff_ (b, ps, []) = borrow (b, ps)
+      | diff_ (b, p :: ps, q :: qs) = ((p - q - b) mod 2) :: diff_(~((p - q - b) div 2), ps, qs);
+in fun diff (ps, qs) = diff_ (0, ps, qs);
+end;
+#+END_SRC
+
+Here we used ~b~ for borrow flag, i.e. if ~b~ equals to 1 then 1 bit borrowed
+from this postion at lower postion.
+
+Then borrow:
+#+BEGIN_SRC sml
+fun borrow (0, ps) = ps
+  | borrow (1, []) = [~1]
+  | borrow (1, p :: ps) = (1-p) :: borrow ((1-p), ps);
+#+END_SRC
+
+Negation of binary number:
+#+BEGIN_SRC sml
+fun neg [] = [] : int list
+  | neg (p :: ps) = ~p :: (neg ps);
+#+END_SRC
+***** ~isNeg~
+By the implementation of diff we can check whether it is negative number by
+inspecting last element:
+#+BEGIN_SRC sml
+fun isNeg [~1] = true
+  | isNeg [_] = false
+  | isNeg (q :: qs) = isNeg qs;
+#+END_SRC
+***** ~zeroPed~
+It shift the binary number ~n~ times:
+#+BEGIN_SRC sml
+fun zeroPed (qs, 0) = qs
+  | zeroPed (qs, n) = 0 :: zeroPed (qs, n-1);
+#+END_SRC
+***** ~quo~
+We get what we wanted using ~quorem~:
+#+BEGIN_SRC sml
+fun quo (ps, qs) = #1 (quorem (ps, qs));
+#+END_SRC
+***** ~rem~
+It is by-product of ~quorem~:
+#+BEGIN_SRC sml
+local fun stripZeros (b::[0]) = [b]
+        | stripZeros (b::[x]) = b::[x]
+        | stripZeros (b :: b1 :: b2 :: bs) = stripZeros (b :: (stripZeros (b1 :: b2 :: bs)));
+in fun rem (ps, qs) = stripZeros (#2 (quorem (ps, qs)));
+end;
+#+END_SRC
+
+**** Exercise 3.17
+It is straight forward to do this:
+#+BEGIN_SRC sml
+structure Bin : ARITH =
+struct
+type t = int list
+
+val zero = [0];
+
+fun carry (0, ps) = ps
+  | carry (1, []) = [1]
+  | carry (1, p :: ps) = (1-p) :: carry (p, ps);
+
+local
+    fun sum_ (c, [], qs) = carry (c, qs)
+      | sum_ (c, ps, []) = carry (c, ps)
+      | sum_ (c, p :: ps, q :: qs) = ((c + p + q) mod 2) :: sum_((c + p + q) div 2, ps, qs);
+in fun sum (ps, qs) = sum_ (0, ps, qs);
+end;
+
+fun neg [] = [] : int list
+  | neg (p :: ps) = ~p :: (neg ps);
+
+fun borrow (0, ps) = ps
+  | borrow (1, []) = [~1]
+  | borrow (1, p :: ps) = (1-p) :: borrow ((1-p), ps);
+
+local
+    fun diff_ (b, [], qs) = neg (carry (b, qs))
+      | diff_ (b, ps, []) = borrow (b, ps)
+      | diff_ (b, p :: ps, q :: qs) = ((p - q - b) mod 2) :: diff_(~((p - q - b) div 2), ps, qs);
+in fun diff (ps, qs) = diff_ (0, ps, qs);
+end;
+
+fun prod ([], _) = []
+  | prod (0::ps, qs) = 0::prod(ps, qs)
+  | prod (1::ps, qs) = sum(qs, 0::prod(ps, qs));
+
+
+local
+fun zeroPed (qs, 0) = qs
+  | zeroPed (qs, n) = 0 :: zeroPed (qs, n-1);
+
+fun isNeg [~1] = true
+  | isNeg [_] = false
+  | isNeg (q :: qs) = isNeg qs;
+
+fun quorem_ (ps, qs, n, quot) =
+    if n < 0 then (quot, ps)
+    else let val qs' = zeroPed (qs, n)
+             val rem = diff (ps, qs')
+         in if (isNeg rem) then
+                if (null quot) then quorem_ (ps, qs, n-1, quot)
+                else quorem_ (ps, qs, n-1, 0::quot)
+            else quorem_ (rem, qs, n-1, 1::quot)
+         end;
+in fun quorem (ps, qs) =
+       let val lp = length ps
+           val lq = length qs
+       in if lp < lq then (zero, ps)
+          else quorem_ (ps, qs, lp - lq, [])
+       end;
+end
+
+fun quo (ps, qs) = #1 (quorem (ps, qs));
+
+local fun stripZeros (b::[0]) = [b]
+        | stripZeros (b::[x]) = b::[x]
+        | stripZeros (b :: b1 :: b2 :: bs) = stripZeros (b :: (stripZeros (b1 :: b2 :: bs)));
+in fun rem (ps, qs) = stripZeros (#2 (quorem (ps, qs)));
+end;
+end;
+#+END_SRC
+**** Exercise 3.18
+To convert decimal numbers to binary number, first we should experiment with
+some example: 41 \to 11001.
+
+All we need to do is accumulate the sequence of remainders when we repeatedly
+divid the decimal number with 2.
+
+These are quite straightforward implementation:
+#+BEGIN_SRC sml
+(* →binary *)
+fun toBinary 0 = []
+  | toBinary n = (n mod 2) :: (toBinary (n div 2));
+
+(* →decimal *)
+fun toDecimal [] = 0
+  | toDecimal (b::bs) = b + 2 * (toDecimal bs);
+#+END_SRC
 
 * Footnotes
 

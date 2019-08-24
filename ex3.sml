@@ -71,3 +71,157 @@ fun allChange (coins, coinvals, 0, results) = coins :: results
                    c :: coinvals,
                    amount - c,
                    allChange(coins, coinvals, amount, results));
+(* Section 3.8 *)
+signature ARITH =
+sig
+    type t
+    val zero : t
+    val sum : t * t -> t
+    val diff : t * t -> t
+    val prod : t * t -> t
+    val quo : t * t -> t
+end;
+
+structure Bin : ARITH =
+struct
+type t = int list
+
+val zero = [0];
+
+fun carry (0, ps) = ps
+  | carry (1, []) = [1]
+  | carry (1, p :: ps) = (1-p) :: carry (p, ps);
+
+local
+    fun sum_ (c, [], qs) = carry (c, qs)
+      | sum_ (c, ps, []) = carry (c, ps)
+      | sum_ (c, p :: ps, q :: qs) = ((c + p + q) mod 2) :: sum_((c + p + q) div 2, ps, qs);
+in fun sum (ps, qs) = sum_ (0, ps, qs);
+end;
+
+fun neg [] = [] : int list
+  | neg (p :: ps) = ~p :: (neg ps);
+
+fun borrow (0, ps) = ps
+  | borrow (1, []) = [~1]
+  | borrow (1, p :: ps) = (1-p) :: borrow ((1-p), ps);
+
+local
+    fun diff_ (b, [], qs) = neg (carry (b, qs))
+      | diff_ (b, ps, []) = borrow (b, ps)
+      | diff_ (b, p :: ps, q :: qs) = ((p - q - b) mod 2) :: diff_(~((p - q - b) div 2), ps, qs);
+in fun diff (ps, qs) = diff_ (0, ps, qs);
+end;
+
+fun prod ([], _) = []
+  | prod (0::ps, qs) = 0::prod(ps, qs)
+  | prod (1::ps, qs) = sum(qs, 0::prod(ps, qs));
+
+
+local
+fun zeroPed (qs, 0) = qs
+  | zeroPed (qs, n) = 0 :: zeroPed (qs, n-1);
+
+fun isNeg [~1] = true
+  | isNeg [_] = false
+  | isNeg (q :: qs) = isNeg qs;
+
+fun quorem_ (ps, qs, n, quot) =
+    if n < 0 then (quot, ps)
+    else let val qs' = zeroPed (qs, n)
+             val rem = diff (ps, qs')
+         in if (isNeg rem) then
+                if (null quot) then quorem_ (ps, qs, n-1, quot)
+                else quorem_ (ps, qs, n-1, 0::quot)
+            else quorem_ (rem, qs, n-1, 1::quot)
+         end;
+in fun quorem (ps, qs) =
+       let val lp = length ps
+           val lq = length qs
+       in if lp < lq then (zero, ps)
+          else quorem_ (ps, qs, lp - lq, [])
+       end;
+end
+
+fun quo (ps, qs) = #1 (quorem (ps, qs));
+
+local fun stripZeros (b::[0]) = [b]
+        | stripZeros (b::[x]) = b::[x]
+        | stripZeros (b :: b1 :: b2 :: bs) = stripZeros (b :: (stripZeros (b1 :: b2 :: bs)));
+in fun rem (ps, qs) = stripZeros (#2 (quorem (ps, qs)));
+end;
+end;
+
+(* Exercise 3.15 *)
+
+(* structure BinBool : ARITH = *)
+(* struct *)
+(* val zero = [false]; *)
+(* fun carry (false, ps) = ps *)
+(*   | carry (true, []) = [true] *)
+(*   | carry (true, p :: ps) = (not p) :: carry (p, ps); *)
+
+(* infix xor; *)
+(* fun b xor b' = (b andalso not b') orelse (not b andalso b'); *)
+
+(* local *)
+(* fun sum_ (c, [], qs) = carry (c, qs) *)
+(*   | sum_ (c, ps, []) = carry (c, ps) *)
+(*   | sum_ (false, p :: ps, q :: qs) = opxor (p, q) :: sum_(p andalso q, ps, qs) *)
+(*   | sum_ (true, p :: ps, q :: qs) = (not opxor (p, q)) :: sum_(p orelse q, ps, qs); *)
+(* in sum (ps, qs) = sum_ (false, ps, qs); *)
+(* end; *)
+
+(* fun neg [] = [] *)
+(*   | neg (p :: ps) = (not p) :: (neg ps); *)
+
+(* fun borrow (false, ps) = ps *)
+(*   | borrow (true, []) = [false] *)
+(*   | borrow (true, p :: ps) = (not p) :: borrow (not p, ps); *)
+
+(* local fun diff_ (b, [], qs) = neg (carry (b, qs)) *)
+(*         | diff_ (b, ps, []) = borrow (b, ps) *)
+(*         | diff_ (b, p :: ps, q :: qs) = *)
+(*           (b xor (p xor q)) :: diff_ ((b andalso q) orelse (not p andalso (b xor q)), ps, qs); *)
+(* in fun diff (ps, qs) = diff_ (false, ps, qs) *)
+(* end; *)
+
+(* fun prod ([], _) = [] *)
+(*   | prod (false::ps, qs) = false::prod(ps, qs) *)
+(*   | prod (true::ps, qs) = sum(qs, false::prod(ps, qs)); *)
+
+(* fun zeroPed (ps, 0) = ps *)
+(*   | zeroPed (ps, n) = false :: (zeroPed (ps, n - 1)); *)
+
+(* fun isNeg [] = false *)
+(*   | isNeg [false] = true *)
+(*   | isNeg (p :: ps) = isNeg ps; *)
+
+(* local fun quorem_ (ps, qs, n, quot) = *)
+(*           if n < 0 then (quot, ps) *)
+(*           else let val qs' = zeroPed (qs, n) *)
+(*                    val rem = diff (ps, qs') *)
+(*                in if (isNeg rem) then *)
+(*                       if (null quot) then quorem_ (ps, qs, n-1, quot) *)
+(*                       else quorem_ (ps, qs, n-1, false :: quot) *)
+(*                   else quorem_ (rem,qs,n-1,true :: quot) *)
+(*                end; *)
+(* in fun quorem (ps, qs) = *)
+(*        let val lp = length ps *)
+(*            val lq = length qs *)
+(*        in if lp < lq then (zero, ps) *)
+(*           else quorem_ (ps, qs, lp - lq, []) *)
+(*        end; *)
+(* end; *)
+
+
+(* end; *)
+
+(* Exercise 3.18 *)
+(* →binary *)
+fun toBinary 0 = []
+  | toBinary n = (n mod 2) :: (toBinary (n div 2));
+
+(* →decimal *)
+fun toDecimal [] = 0
+  | toDecimal (b::bs) = b + 2 * (toDecimal bs);
