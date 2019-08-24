@@ -225,3 +225,29 @@ fun toBinary 0 = []
 (* →decimal *)
 fun toDecimal [] = 0
   | toDecimal (b::bs) = b + 2 * (toDecimal bs);
+
+fun toBinarySeq [] = []
+  | toBinarySeq (d::ds) = Bin.sum(toBinary d,
+                                  Bin.prod(toBinary 10,
+                                           toBinarySeq ds));
+
+fun decimal_add (d', []) = [d']
+  | decimal_add (0, ds) = ds
+  | decimal_add (d', d::ds) = ((d' + d) mod 10) :: decimal_add ((d' + d) div 10, ds);
+
+fun decimal_times (n,[]) = []
+  | decimal_times (n,d::ds) = ((n*d) mod 10) :: decimal_add ((n*d) div 10,
+                                                             decimal_times (n,ds));
+
+fun toDecimalSeq [] = []
+  | toDecimalSeq (b::bs) = decimal_add (b,
+                                        decimal_times (2,toDecimalSeq(bs)));
+
+
+fun factorial 1 = [1]
+  | factorial n = decimal_times (n,factorial (n-1));
+
+fun stringList xs = String.concatWith "" (map Int.toString xs);
+fun stripZero (0::xs) = xs
+  | stripZero xs = xs;
+fun stringFactorial n = stringList (stripZero (rev (factorial n)));

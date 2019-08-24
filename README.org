@@ -1080,6 +1080,40 @@ fun toDecimal [] = 0
   | toDecimal (b::bs) = b + 2 * (toDecimal bs);
 #+END_SRC
 
+But it's not what this exercise wanted: We should treat decimal /sequence/ not
+the numeral built in SML; although, we can get insight from above impelementaion
+with wishful thinking:
+#+BEGIN_SRC sml
+fun toBinarySeq [] = []
+  | toBinarySeq (d::ds) = Bin.sum(toBinary d,
+                                  Bin.prod(toBinary 10,
+                                           toBinarySeq ds));
+#+END_SRC
+
+The reverse works similary but need auxilary functions:
+#+BEGIN_SRC sml
+fun decimal_add (d', []) = [d']
+  | decimal_add (0, ds) = ds
+  | decimal_add (d', d::ds) = ((d' + d) mod 10) :: decimal_add ((d' + d) div 10, ds);
+
+fun decimal_times (n,[]) = []
+  | decimal_times (n,d::ds) = ((n*d) mod 10) :: decimal_add ((n*d) div 10,
+                                                             decimal_times (n,ds));
+
+fun toDecimalSeq [] = []
+  | toDecimalSeq (b::bs) = decimal_add (b,
+                                        decimal_times (2,toDecimalSeq(bs)));
+
+
+fun factorial 1 = [1]
+  | factorial n = decimal_times (n,factorial (n-1));
+
+fun stringList xs = String.concatWith "" (map Int.toString xs);
+fun stripZero (0::xs) = xs
+  | stripZero xs = xs;
+fun stringFactorial n = stringList (stripZero (rev (factorial n)));
+#+END_SRC
+
 * Footnotes
 
 [fn:1] By comparing with the recursive vesion of ~fib~.
